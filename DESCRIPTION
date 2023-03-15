@@ -1,0 +1,11 @@
+Package: loessclust
+Type: Package
+Title: For in-depth LOESS and time series analysis
+Version: 0.1.0
+Author: Sean Yoon
+Maintainer: Sean Yoon <sean777@stanford.edu>
+Description: More about what it does (maybe more than one line)
+    Use four spaces when indenting paragraphs within the Description.
+License: MIT License
+Encoding: UTF-8
+LazyData: true
