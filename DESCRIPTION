@@ -1,6 +1,6 @@
 Package: loessclust
 Type: Package
-Title: For in-depth LOESS and time series analysis
+Title: Analyzing time series data using LOESS interpolation and hierarchical clustering
 Version: 0.1.0
 Author: Sean Yoon
 Maintainer: Sean Yoon <sean777@stanford.edu>

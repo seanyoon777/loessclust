@@ -32,9 +32,12 @@ models.loess <- function(x, Y, scale = TRUE, weights, subset, na.action,
                          family = c("gaussian", "symmetric"),
                          method = c("loess", "model.frame"),
                          control = loess.control(surface="direct"), ...) {
+  # set up
   Y <- data.frame(Y)
   names_Y <- names(Y)
   models <- vector("list", length(names_Y))
+
+
   if (missing(scale)) scale <- TRUE
   if (scale == TRUE) {
     x <- data.frame(scale(x))
