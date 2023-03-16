@@ -1,62 +1,37 @@
 \name{data.loess}
 \alias{data.loess}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{f
-%%  ~~function to do ... ~~
+\title{Interpolate data using LOESS for each variable
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
-}
+Applies local regression (LOESS) to an input of a single variable and a second input of multiple variables, interpolating values for the variables with respect to the first input variable.}
 \usage{
-data.loess(x)
+data.loess(x, Y, scale = TRUE, curves,
+           span = 0.75, resolution = 150)
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
-  \item{x}{
-%%     ~~Describe \code{x} here~~
+  \item{x}{An object of class "data.frame" (or one that can be coerced into that class): the variable to be used to interpolate models. ('x' in regression)
 }
+  \item{Y}{An object of class "data.frame" (or one that can be coerced into that class): the variables to be interpolated. ('y' in regression)}
+  \item{scale}{Optional. A boolean to determine whether data should be scaled. Default value is TRUE.}
+  \item{curves}{Optional. A list of LOESS models, where each model interpolates the given variables in Y using x. Can reduce computation time. }
+  \item{span}{Optional. A numeric \code{α} which controls the degree of smoothing.}
+  \item{resolution}{Optional. An integer that determines the interval of the \code{x} when interpolating.}
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+The function will use default parameters specified in \link{models.loess} for LOESS interpolation.
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+\item{data_pred}{A data.frame where the first column is evenly spaced values of \code{x}, and the remaining columns are interpolated values of the other variables.}
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
-\author{
-%%  ~~who you are~~
-}
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+See \link{loess} for parameters used in curve fitting.
+Also see \link{models.loess} for possible inputs for the \code{curves} parameter.
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (x)
-{
-  }
+iris_models <- models.loess(iris[1], iris[2:4], control=loess.control(surface="direct"))
+data.loess(iris[1], iris[2:4], curves = iris_models)
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory (show via RShowDoc("KEYWORDS")):
-% \keyword{ ~kwd1 }
-% \keyword{ ~kwd2 }
-% Use only one keyword per line.
-% For non-standard keywords, use \concept instead of \keyword:
-% \concept{ ~cpt1 }
-% \concept{ ~cpt2 }
-% Use only one concept per line.
+
+

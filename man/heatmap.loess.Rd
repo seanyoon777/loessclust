@@ -1,62 +1,43 @@
 \name{heatmap.loess}
 \alias{heatmap.loess}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{f
-%%  ~~function to do ... ~~
-}
+\title{Create heatmap of LOESS-interpolated time series data}
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Applies local regression (LOESS) to an input of a single variable and a second input of multiple variables, creating a heatmap of interpolated values for each variable.
 }
 \usage{
-heatmap.loess(x)
+heatmap.loess(x, Y, curves, data_pred, scale = TRUE,
+              resolution = 150, span = 0.75,
+              title, axis.label.x, axis.label.y,
+              axis.line.x, axis.line.y,
+              axis.title.x, axis.title.y,
+              color.min = "blue", color.max = "red")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{
-%%     ~~Describe \code{x} here~~
+  \item{x}{An object of class "data.frame" (or one that can be coerced into that class): the variable to be used to interpolate models. ('x' in regression)
 }
+  \item{Y}{An object of class "data.frame" (or one that can be coerced into that class): the variables to be interpolated. ('y' in regression)}
+  \item{scale}{Optional. A boolean to determine whether data should be scaled. Default value is TRUE.}
+  \item{curves}{Optional. A list of LOESS models, where each model interpolates the given variables in Y using x. Can reduce computation time. }
+  \item{data_pred}{Optional. A "data.frame" of predicted data, where the first column is the \code{x} variable values. Can reduce computation time. }
+  \item{span}{Optional. A numeric \code{α} which controls the degree of smoothing.}
+  \item{resolution}{Optional. An integer that determines the interval of the \code{x} when interpolating.}
+  \item{axis.line.x}{Optional. A boolean that determines whether x axis lines should be printed in the graph.}
+  \item{axis.line.y}{Optional. A boolean that determines whether y axis lines should be printed in the graph.}
+  \item{axis.title.x}{Optional. A string for the x axis title.}
+  \item{axis.title.y}{Optional. A string for the y axis title.}
+  \item{color.min}{Optional. The color for minimum value. Default is blue.}
+  \item{color.max}{Optional. The color for maximum value. Default is red. }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+The function will use default parameters specified in \link{models.loess} for LOESS interpolation.
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+A \link{ggplot} plot where each row in the heatmap is the interpolated value for each variable.
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
-\author{
-%%  ~~who you are~~
-}
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+See \link{loess} for parameters used in curve fitting. Also see \link{models.loess} for possible inputs for the curves parameter.
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (x)
-{
-  }
+heatmap.loess(iris[1], iris[2:4])
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory (show via RShowDoc("KEYWORDS")):
-% \keyword{ ~kwd1 }
-% \keyword{ ~kwd2 }
-% Use only one keyword per line.
-% For non-standard keywords, use \concept instead of \keyword:
-% \concept{ ~cpt1 }
-% \concept{ ~cpt2 }
-% Use only one concept per line.
