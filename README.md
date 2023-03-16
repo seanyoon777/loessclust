@@ -39,5 +39,3 @@ Clone the repository to your local directory:
 ```
 git clone https://github.com/seanyoon777/loessclust.git
 ```
-
-## Development
