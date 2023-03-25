@@ -33,7 +33,7 @@ data.loess_test <- test_that("data.loess tests", {
   data_pred <- data.loess(x, Y, resolution = 100, span = 0.2)
   sds <- apply(data_pred, 2, sd)
   sds <- c(sds[[1]], sds[[2]], sds[[3]], sds[[4]])
-  sds_expect <- c(1.274009, 0.458861, 1.050253, 0.957313)
+  sds_expect <- c(1.2740086, 0.4588609, 1.0502528, 0.9573130)
   expect_equal(round(sds, digits = 7), sds_expect)
   mean <- apply(data_pred, 2, mean)
   mean <- c(mean[[1]], mean[[2]], mean[[3]], mean[[4]])
