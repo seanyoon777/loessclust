@@ -29,9 +29,3 @@ The function will use default parameters specified in \link{models.loess} for LO
 See \link{loess} for parameters used in curve fitting.
 Also see \link{models.loess} for possible inputs for the \code{curves} parameter.
 }
-\examples{
-iris_models <- models.loess(iris[1], iris[2:4], control=loess.control(surface="direct"))
-data.loess(iris[1], iris[2:4], curves = iris_models)
-}
-
-

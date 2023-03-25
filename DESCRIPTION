@@ -1,14 +1,23 @@
 Package: loessclust
 Type: Package
-Title: Analyzing time series data using LOESS interpolation and hierarchical clustering
+Title: Analyzing biological or time series data using LOESS interpolation and 
+    hierarchical clustering
 Version: 0.1.0
 Author: Sean Yoon
 Maintainer: Sean Yoon <sean777@stanford.edu>
-Description: A system for analyzing, clustering, and visualizing time series (or 
-    any continuous) data using LOESS. You provide the data, LOESS parameters, and
+Description: A system for analyzing, clustering, and visualizing biological or 
+    time series data using LOESS. You provide the data, LOESS parameters, and
     visualization aesthetics, and the package will create clustered LOESS models 
     and visualizations. Designed to speed up computations through memoization. 
 License: MIT License
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.3
+Imports: 
+    cluster (>= 2.1.0),
+    dplyr (>= 1.0.0),
+    ggplot2 (>= 3.4.0),
+    tidyr (>= 1.3.0)
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

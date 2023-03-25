@@ -22,6 +22,9 @@ heatmap.loess(x, Y, curves, data_pred, scale = TRUE,
   \item{data_pred}{Optional. A "data.frame" of predicted data, where the first column is the \code{x} variable values. Can reduce computation time. }
   \item{span}{Optional. A numeric \code{α} which controls the degree of smoothing.}
   \item{resolution}{Optional. An integer that determines the interval of the \code{x} when interpolating.}
+  \item{title}{Optional. A string for the plot title.}
+  \item{axis.label.x}{Optional. A boolean that determines whether x label should be printed in the graph.}
+  \item{axis.label.y}{Optional. A boolean that determines whether y label should be printed in the graph.}
   \item{axis.line.x}{Optional. A boolean that determines whether x axis lines should be printed in the graph.}
   \item{axis.line.y}{Optional. A boolean that determines whether y axis lines should be printed in the graph.}
   \item{axis.title.x}{Optional. A string for the x axis title.}
@@ -37,7 +40,4 @@ A \link{ggplot} plot where each row in the heatmap is the interpolated value for
 }
 \seealso{
 See \link{loess} for parameters used in curve fitting. Also see \link{models.loess} for possible inputs for the curves parameter.
-}
-\examples{
-heatmap.loess(iris[1], iris[2:4])
 }

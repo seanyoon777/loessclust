@@ -1,12 +1,10 @@
+# Imports
+import(dplyr)
+import(ggplot2)
+import(tidyr)
+import(cluster)
+importFrom("stats", "cutree", "dist", "hclust", "loess",
+               "loess.control", "predict")
+
+# Exports
 exportPattern("^[[:alpha:]]+")
-
-export(models.loess)
-export(data.loess)
-export(heatmap.loess)
-export(cluster.loess)
-export(clusterplot.loess)
-
-importFrom(ggplot2, ggplot)
-importFrom(dplyr, filter)
-importFrom(tidyr, gather)
-importFrom(cluster, silhouette)

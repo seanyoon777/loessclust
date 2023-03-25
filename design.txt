@@ -1,14 +1,115 @@
 Overview:
+---------
+Loessclust is a R package designed to analyze biological or time series data
+using LOESS interpolation and hierarchical clustering.
 
 Background:
+-----------
+The project was created out of necessity whileconducting research on the role of
+the Blood Brain Barrier's aging on neurodegenerative diseases. The project
+required an exploration of how over 7,000 types of protein expression levels in
+the plasma and the cerebrospinal fluid were related, and how the relationship
+changed over age.
+
+The nature of the project itself required an examination of relationship of
+multiple variables (protein expression levels) with respect to a single variable
+(age), meaning a software that can analyze trends with respect to a single
+variable could make the data analysis and visualization much simpler and easier.
+
+Hence, loessclust is designed to provide assistance to researhers attempting to
+discover how multiple variables are related to a single variale, and how the
+variables' trends are related with oneanother. This is often the case when using
+biological data (genomic, proteomic, etc), or time series data.
 
 Goals:
+------
+1. Interpolate for multiple variables and generate data
+- Interpolating for multiple variables with respect to a single variable. Although
+other methods like kernel regression can be used, LOESS will be employed in this
+case as it is computationally relatively cheaper and accurate.
+
+2. Automatically cluster the trends hierarchically
+- After interpolating trends, the package will be able to cluster the variables
+by trend. The function should also determine the optimal number of clusters itself.
+
+3. Visualize results using various plots
+- The results should be visualized using various plots, like a side-by-side plot
+of each cluster or a heatmap where each row represents how each variable changes.
+
+4. Potentially speed up computation
 
 Non-goals:
+----------
+1. Creating any user-specified graphics with interpolated or clustered data
+- For the objective of "visualizing and clustering trends," a plot where multiple
+trends are shown side-by-side, and a heatmap were thought to be sufficient for
+most research projects. To create a package that can create any graphics would
+simply be re-engineering visualization packages like ggplot2, and would
+unnecessarily widen the scope of this software.
 
-
-Future goals:
-
+2. Implement clustering or LOESS from start to end for speeding up computation
+- The existing functions in R packages such as LOESS() or cluster() are already
+sufficiently optimized, and reimplementing these functions would widen the scope
+of this software. Instead, computation will be made faster by storing important
+data in variables, instead of re-calculating them each time.
 
 Detailed Design:
+The models.loess function takes two dataframes as inputs, and optionally takes
+parameters for LOESS interpolation. It then produces LOESS models to predict each
+of the variables with respect to the x variable. The data.loess function creates
+a dataframe using the models.loess function, where the interval of the x variable
+can be specified as user input. The LOESS models obtained from models.loess is an
+optional parameter, which would make it unnecessary to compute the models again
+when interpolating the data.
+
+The cluster.loess function then clusters the data. It takes two dataframes as
+inputs, but the LOESS models or interpolated data can be provided as an optional
+input, which would again make it unnecessary to compute the models and data again,
+hence reducing computation. The function then uses hierarchical clustering, as
+it is generally better than k-means for biological data, to cluster the data.
+It takes an optional input representing the number of clusters, but if not
+specified it determines the optimal number of clusters itself using the silhouette
+method. The silhouette method has been chosen as it is less subject to human bias
+than the elbow method, and is computationally cheaper than the gap statistic,
+hence it is a good balance of computational time (linked to goal 4) and accuracy.
+It then produces a "melted" dataframe with a column denoting which cluster each
+variable belongs to.
+
+The heatmap.loess and clusterplot.loess functions produce visualizations of the
+LOESS-interpolated data. heatmap.loess creates a heatmap where each row of the
+plot uses color to represent how the variable value changes, and clusterplot.loess
+hierarchically clusters variables by trend and plots each trend side-by-side.
+The interpolated data, LOESS models, or the clustered data are accepted as
+optional parameters, which would save clusterplot.loess from computing and
+clustering the given data. Within clusterplot.loess, if the optional variables
+are not provided, it calls data.loess and cluster.loess to interpolate and
+cluster the data.
+
+Future goals:
+-------------
+1. Diversify regression methods
+- Altough only LOESS has been used in the development of this package, other
+methods like kernel regression or logistic regression would also be helpful.
+Particularly, if the researcher is interested in trends outside the range of the
+given data, polynomial regression could be a particular technique of interest.
+It would be helpful to integrate different types of regression methods, where the
+client can choose depending on the situation.
+
+2. More accurate means to determine optimal number of clusters
+- The function currently utilizes only the silhouette method, which may be
+inaccurate at times, especially when given a dataset where clustering more than
+necessary results in a minute increase in the silhouette coefficient. A voting
+system could be implemented, where multiple methods can decide the optimal
+number of clusters, and undergo a voting process to determine the optimal number.
+However, the tradeoff between computation and increase in accuracy may not be
+optimal if too many methods are used.
+
+3. Diversify visualization
+- Although functions to visualize for ANY user preference, like ggplot2, would be
+unnecessary, it would definitely be helpful to have a handful of different types
+of plots, or more parameters in the functions that are currently implemented for
+visualization.
+
+
+
 

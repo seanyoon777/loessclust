@@ -24,7 +24,3 @@ models.loess(x, Y, scale = TRUE, weights, subset, na.action,
 \seealso{
 Also see \link{loess} for other parameters.
 }
-\examples{
-iris_models <- models.loess(iris[1], iris[2:4], control=loess.control(surface="direct"))
-predict(iris_models, seq(2, 7, 0.5))
-}

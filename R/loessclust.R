@@ -18,9 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
-
-
+############################ FUNCTION IMPLEMTATIONS ############################
 
 # FUNCTION: models.loess
 # ----------------------
@@ -55,8 +53,9 @@ models.loess <- function(x, Y, scale = TRUE, weights, subset, na.action,
 
   # Iterate through Y values to determine LOESS models
   for (i in seq_along(names_Y)) {
-    models[[i]] <- loess(Y[[i]] ~ x[,1], weights = weights, subset = subset, na.action = na.action,
-                         span = span, enp.target = enp.target, degree = degree, parametric = parametric,
+    models[[i]] <- loess(Y[[i]] ~ x[,1], weights = weights, subset = subset,
+                         na.action = na.action, span = span, enp.target =
+                           enp.target, degree = degree, parametric = parametric,
                          drop.square = drop.square, normalize = normalize,
                          family = family, method = method,
                          control = control, ...)
@@ -97,6 +96,59 @@ data.loess <- function(x, Y, scale = TRUE, curves, span = 0.75, resolution = 150
   }
   names(data_pred) <- c("axis.values.x", names_Y)
   return(data_pred)
+}
+
+
+# FUNCTION: cluster.loess
+# -----------------------
+#
+# Clusters the variables by their trends with respect to the single variable x.
+# Uses default LOESS values in models.loess
+cluster.loess <- function(x, Y, curves, data_pred, scale = TRUE, nclust,
+                          resolution = 150, loess.span = 0.75,
+                          clust.method = "ward.D") {
+  # Scale data
+  if (scale == TRUE) {
+    x <- scale(x)
+    Y <- scale(Y)
+  }
+  x <- data.frame(x)
+  Y <- data.frame(Y)
+
+  # Get curves and data (memoization implemented to speed up computations!)
+  if (missing(data_pred)) {
+    if (missing(curves)) {
+      warning("default LOESS parameters used for value interpolation")
+      curves <- models.loess(x, Y, span = loess.span, scale = FALSE)
+    }
+    data_pred <- data.loess(x, Y, curves = curves, resolution = resolution, scale = FALSE)
+  }
+
+  # Compute optimal number of clusters using the silhouette method
+  data_dist <- dist(t(data_pred[-1]), method="euclidean")
+  data_clust <- hclust(data_dist, method = "ward.D")
+  if (missing(nclust)) {
+    max_clust <- min(nrow(data_pred) - 2, 10)
+    silhouette_list <- numeric(max_clust - 1)
+    for (k in 2:max_clust) {
+      cut_clusters <- cutree(data_clust, k)
+      vals <- silhouette(cut_clusters, data_dist)
+      silhouette_val <- mean(vals[, 3])
+      silhouette_list[k - 1] <- silhouette_val
+    }
+    nclust <- which.max(silhouette_list) + 1
+  }
+  print(paste("optimal number of clusters: ", nclust))
+
+  # Cluster data with optimal number of clusters
+  clust <- cutree(data_clust, k = nclust) %>%
+    data.frame(cluster = .)
+  clust$variables <- names(Y)
+  data_long <- data_pred %>% gather(key = variables, value = value, -axis.values.x)
+  data_clust <- data_long %>% inner_join(clust, by = "variables") %>%
+    arrange(cluster, variables, axis.values.x)
+
+  return(data_clust)
 }
 
 
@@ -154,61 +206,18 @@ heatmap.loess <- function(x, Y, curves, data_pred, scale = TRUE,
 }
 
 
-# FUNCTION: heatmap.loess
-# -----------------------
+# FUNCTION: clusterplot.loess
+# ---------------------------
 #
-# Produce heatmap for interpolated data for each variables in Y, with respect to
-# x. Uses default LOESS values in models.loess
-cluster.loess <- function(x, Y, curves, data_pred, scale = TRUE, nclust,
-                          resolution = 150, loess.span = 0.75,
-                          clust.method = "ward.D") {
-  # Scale data
-  if (scale == TRUE) {
-    x <- scale(x)
-    Y <- scale(Y)
-  }
-  x <- data.frame(x)
-  Y <- data.frame(Y)
-
-  # Get curves and data (memoization implemented to speed up computations!)
-  if (missing(data_pred)) {
-    if (missing(curves)) {
-      warning("default LOESS parameters used for value interpolation")
-      curves <- models.loess(x, Y, span = loess.span)
-    }
-    data_pred <- data.loess(x, Y, curves = curves, resolution = resolution)
-  }
-
-  # Compute optimal number of clusters
-  data_dist <- dist(t(data_pred[-1]), method="euclidean")
-  data_clust <- hclust(data_dist, method = "ward.D")
-  if (missing(nclust)) {
-    max_clust <- min(nrow(data_pred) - 2, 10)
-    silhouette_list <- numeric(max_clust - 1)
-    for (k in 2:max_clust) {
-      cut_clusters <- cutree(data_clust, k)
-      vals <- silhouette(cut_clusters, data_dist)
-      silhouette_val <- mean(vals[, 3])
-      silhouette_list[k - 1] <- silhouette_val
-    }
-    nclust <- which.max(silhouette_list) + 1
-  }
-  print(paste("optimal number of clusters: ", nclust))
-
-  # Cluster data with optimal number of clusters
-  clust <- cutree(data_clust, k = nclust) %>%
-    data.frame(cluster = .)
-  clust$variables <- names(Y)
-  data_long <- data_pred %>% gather(key = variables, value = value, -axis.values.x)
-  data_clust <- data_long %>% inner_join(clust, by = "variables") %>%
-    arrange(cluster, variables, axis.values.x)
-
-  return(data_clust)
-}
-
-
+# Produce a plot where trends for different clusters are shown side-by-side for
+# interpolated data for each variables in Y, with respect to x. Uses default
+# LOESS values in models.loess
 clusterplot.loess <- function(x, Y, curves, data_pred, cluster, scale = TRUE,
-                       loess.span = 0.75, clust.method = "ward.D") {
+                       nclust, resolution = 150, loess.span = 0.75,
+                       clust.method = "ward.D",
+                       title, axis.label.x, axis.label.y,
+                       axis.line.x, axis.line.y,
+                       axis.title.x, axis.title.y) {
   # Scale data
   if (scale == TRUE) {
     x <- scale(x)
@@ -226,13 +235,19 @@ clusterplot.loess <- function(x, Y, curves, data_pred, cluster, scale = TRUE,
       }
       data_pred <- data.loess(x, Y, curves = curves, resolution = resolution)
     }
-    cluster <- cluster.loess(x, Y, curves = curves, data_pred = data_pred)
+    if (missing(nclust)) {
+      cluster <- cluster.loess(x, Y, curves = curves, data_pred = data_pred)
+    } else {
+      cluster <- cluster.loess(x, Y, curves = curves, data_pred = data_pred, nclust = nclust)
+    }
   }
 
-  cluster %>%
+  # Generate plot
+  figure <- cluster %>%
     ggplot(aes(x = axis.values.x, y = value, group = variables, color = factor(cluster))) +
     geom_line(stat = "smooth", method = "loess", se = FALSE, linewidth = 0.5, alpha = 0.1) +
-    scale_color_manual(values = c("#FF6F61", "#6B5B95", "#88B04B", "#FFA500", "#92A8D1", "#FF69B4", "#955251")) +
+    scale_color_manual(
+      values = c("#FF6F61", "#6B5B95", "#88B04B", "#FFA500", "#92A8D1", "#FF69B4", "#955251")) +
     labs(x = "X-axis", y = "Y-axis", color = "Cluster") +
     facet_wrap(~ cluster, ncol = 3, nrow = 4, labeller = labeller(cluster = as.character)) +
     stat_summary(fun.data = "mean_cl_normal", geom = "line",
@@ -241,6 +256,17 @@ clusterplot.loess <- function(x, Y, curves, data_pred, cluster, scale = TRUE,
     stat_summary(fun.data = "mean_cl_normal", geom = "line",
                  aes(group = cluster, color = factor(cluster)),
                  linewidth = 0.5, alpha = 0.8)
+
+  # Additional parameters for plot
+  if (!missing(title)) figure <- figure + ggtitle(title) + theme(plot.title = element_text(hjust = 0.5))
+  if (!missing(axis.title.x)) figure <- figure + theme(axis.title.x = element_blank())
+  if (!missing(axis.title.y)) figure <- figure + theme(axis.title.y = element_blank())
+  if (!missing(axis.label.x)) figure <- figure + xlab(axis.label.x)
+  if (!missing(axis.label.y)) figure <- figure + ylab(axis.label.y)
+  if (!missing(axis.line.x)) figure <- figure + theme(axis.line.x = axis.line.x)
+  if (!missing(axis.line.y)) figure <- figure + theme(axis.line.y = axis.line.y)
+
+  return(figure)
 }
 
 
